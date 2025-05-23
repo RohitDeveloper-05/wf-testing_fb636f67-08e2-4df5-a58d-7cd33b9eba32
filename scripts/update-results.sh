@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -e
+IFS='_' read -ra parts <<< "$REPO_NAME"
+export ASSESSMENT_ID="${parts[1]}"
 
 echo "Extracting test history from results.json..."
 
@@ -9,9 +11,9 @@ numPassed=$(jq '.numPassedTests' results.json)
 numTotal=$(jq '.numTotalTests' results.json)
 # echo "Formatted Test History: $testHistory"
 testScore="${numPassed}/${numTotal}"
-# resultSummary=$(jq -n --argjson history "$testHistory" '{ result_summary: $history }')
+#resultSummary=$(jq -n --argjson history "$testHistory" '{ result_summary: $history }')
 
-# echo "Payload to PATCH: $resultSummary"
+#echo "Payload to PATCH: $resultSummary"
 payload=$(jq -n \
   --argjson summary "$testHistory" \
   --arg score "$testScore" \

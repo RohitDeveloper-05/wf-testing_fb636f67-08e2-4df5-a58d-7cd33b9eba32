@@ -1,7 +1,8 @@
 #!/bin/bash
-
 IFS='_' read -ra parts <<< "$REPO_NAME"
 export FLOW_NAME="${parts[0]}"
+
+echo "Flow Name derived from REPO_NAME: $FLOW_NAME"
 
 node <<'EOF'
 const { createClient } = require('@supabase/supabase-js');
@@ -10,11 +11,13 @@ const { execSync } = require('child_process');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 (async () => {
- const flowName = process.env.FLOW_NAME;
+  const flowName = process.env.FLOW_NAME;
+
   const { data, error } = await supabase
     .from('assessments')           
     .select('*')                
-    .eq('name','flowName' );
+    .eq('name', flowName);  // Corrected here
+
   if (error) {
     console.error('Supabase error:', error);
     process.exit(1);
@@ -30,6 +33,11 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
     process.exit(1);
   }
 
-  execSync(`curl -f -o tests/test-case-private.test.js "${url}"`, { stdio: 'inherit' });
+  try {
+    execSync(`curl -f -o tests/test-case-private.test.js "${url}"`, { stdio: 'inherit' });
+  } catch (e) {
+    console.error('Failed to download test case from S3:', e.message);
+    process.exit(1);
+  }
 })();
 EOF

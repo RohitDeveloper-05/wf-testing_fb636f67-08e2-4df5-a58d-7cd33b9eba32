@@ -1,4 +1,6 @@
 #!/bin/bash
+IFS='_' read -ra parts <<< "$REPO_NAME"
+export ASSESSMENT_ID="${parts[1]}"
 
 set -e
 

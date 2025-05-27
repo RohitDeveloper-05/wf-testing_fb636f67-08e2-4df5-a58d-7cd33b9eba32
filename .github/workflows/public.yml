@@ -25,5 +25,3 @@ jobs:
 
       - name: Run public test cases
         run: npm run unit
-
-      

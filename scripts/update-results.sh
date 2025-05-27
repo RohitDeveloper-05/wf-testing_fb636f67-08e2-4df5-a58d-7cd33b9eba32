@@ -1,8 +1,14 @@
 #!/bin/bash
-
-set -e
 IFS='_' read -ra parts <<< "$REPO_NAME"
 export ASSESSMENT_ID="${parts[1]}"
+
+set -e
+
+IFS='_' read -ra parts <<< "$REPO_NAME"
+export ASSESSMENT_ID="${parts[1]}"
+
+
+echo "ASSESSMENT ID: $ASSESSMENT_ID"
 
 echo "Extracting test history from results.json..."
 

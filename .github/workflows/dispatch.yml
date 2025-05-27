@@ -1,32 +1,19 @@
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
-  merge-dev-into-main-and-run:
+  build-and-test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout main branch with full history
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: main
-          fetch-depth: 0 # important to get full history for merging
-
-      - name: Configure Git user
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Merge dev branch into main
-        run: |
-          git fetch origin dev
-          git merge origin/dev --no-ff -m "Merge dev into main from workflow"
-
-      - name: Push updated main branch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git push origin main
+          fetch-depth: 0
 
       - name: Use Node.js
         uses: actions/setup-node@v4

@@ -1,14 +1,8 @@
 #!/bin/bash
-IFS='_' read -ra parts <<< "$REPO_NAME"
-export ASSESSMENT_ID="${parts[1]}"
 
 set -e
-
 IFS='_' read -ra parts <<< "$REPO_NAME"
 export ASSESSMENT_ID="${parts[1]}"
-
-
-echo "ASSESSMENT ID: $ASSESSMENT_ID"
 
 echo "Extracting test history from results.json..."
 
@@ -18,14 +12,16 @@ numTotal=$(jq '.numTotalTests' results.json)
 # echo "Formatted Test History: $testHistory"
 testScore="${numPassed}/${numTotal}"
 #resultSummary=$(jq -n --argjson history "$testHistory" '{ result_summary: $history }')
+submittedAt=$(date +"%Y-%m-%dT%H:%M:%S%:z")
 
 #echo "Payload to PATCH: $resultSummary"
 payload=$(jq -n \
   --argjson summary "$testHistory" \
   --arg score "$testScore" \
-  '{ results: { "result-score": $score, "result-summary": $summary } }')
+  --arg submittedAt "$submittedAt" \
+   '{submitted_at: $submittedAt, status: "Submitted", results: { "result-score": $score, "result-summary": $summary } }')
 
-curl -X PATCH "$SUPABASE_URL/rest/v1/candidate_assessment?id=eq.${ASSESSMENT_ID}" \
+curl -s -o /dev/null -w "%{http_code}" -X PATCH "$SUPABASE_URL/rest/v1/candidate_assessment?id=eq.${ASSESSMENT_ID}&submitted_at=is.null" \
   -H "apikey: $SUPABASE_API_KEY" \
   -H "Authorization: Bearer $SUPABASE_API_KEY" \
   -H "Content-Type: application/json" \

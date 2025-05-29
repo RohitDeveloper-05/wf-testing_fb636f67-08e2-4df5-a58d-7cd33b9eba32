@@ -1,14 +1,9 @@
 #!/bin/bash
-set -e
-
-# Extract assessment name
 IFS='_' read -ra parts <<< "$REPO_NAME"
-export ASSESSMENT_NAME="${parts[0]}"
-export FLOW_NAME="$ASSESSMENT_NAME"
+export FLOW_NAME="${parts[0]}"
 
-echo "Flow Name derived from REPO_NAME: $ASSESSMENT_NAME"
+echo "Flow Name derived from REPO_NAME: $FLOW_NAME"
 
-# Run Node.js script to fetch and download test case
 node <<'EOF'
 const { createClient } = require('@supabase/supabase-js');
 const { execSync } = require('child_process');
@@ -16,12 +11,12 @@ const { execSync } = require('child_process');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 (async () => {
-  const Assessment_Name = process.env.FLOW_NAME;
+  const flowName = process.env.FLOW_NAME;
 
   const { data, error } = await supabase
     .from('assessments')           
     .select('*')                
-    .eq('name', Assessment_Name);  
+    .eq('name', flowName);  // Corrected here
 
   if (error) {
     console.error('Supabase error:', error);
@@ -46,11 +41,3 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
   }
 })();
 EOF
-
-# Run unit tests silently
-echo "Running unit tests..."
-npm run unit > /dev/null 2>&1
-TEST_EXIT_CODE=$?
-
-# Always exit 0
-exit 0

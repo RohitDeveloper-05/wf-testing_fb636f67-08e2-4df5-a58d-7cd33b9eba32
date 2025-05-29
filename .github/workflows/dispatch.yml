@@ -7,6 +7,7 @@ on:
     types:
       - opened
       - synchronize
+      - reopened
 
 jobs:
   build-and-test:
@@ -28,14 +29,20 @@ jobs:
         run: npm install @supabase/supabase-js
 
       - name: Make fetch script executable
-        run: chmod +x scripts/download_hidden_test_and_run
+        run: chmod +x scripts/fetch-hidden-tests.sh
 
-      - name: Fetch S3 URL and download hidden test.Run the downloaded tests.
+      - name: Fetch S3 URL and download hidden test
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_KEY }}
           REPO_NAME: ${{ github.event.repository.name }}
-        run: ./scripts/download_hidden_test_and_run.sh
+        run: ./scripts/fetch-hidden-tests.sh
+
+      - name: Make script executable
+        run: chmod +x scripts/run-tests.sh
+
+      - name: Run tests with minimal output
+        run: scripts/run-tests.sh
         continue-on-error: true
 
       - name: Show Test Summary (Passed/Failed/Total)

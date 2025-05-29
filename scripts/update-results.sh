@@ -2,7 +2,7 @@
 
 set -e
 IFS='_' read -ra parts <<< "$REPO_NAME"
-export CANDIDATE_ASSESSMENT_ID="${parts[1]}"
+export ASSESSMENT_ID="${parts[1]}"
 
 echo "Extracting test history from results.json..."
 
@@ -12,7 +12,7 @@ numTotal=$(jq '.numTotalTests' results.json)
 # echo "Formatted Test History: $testHistory"
 testScore="${numPassed}/${numTotal}"
 #resultSummary=$(jq -n --argjson history "$testHistory" '{ result_summary: $history }')
-#submittedAt=$(date +"%Y-%m-%dT%H:%M:%S%:z")
+submittedAt=$(date +"%Y-%m-%dT%H:%M:%S%:z")
 
 #echo "Payload to PATCH: $resultSummary"
 payload=$(jq -n \
@@ -20,7 +20,7 @@ payload=$(jq -n \
   --arg score "$testScore" \
    '{ results: { "result-score": $score, "result-summary": $summary } }')
 
-curl -s -o /dev/null -w "%{http_code}" -X PATCH "$SUPABASE_URL/rest/v1/candidate_assessment?id=eq.${CANDIDATE_ASSESSMENT_ID}&status=eq.Started" \
+curl -s -o /dev/null -w "%{http_code}" -X PATCH "$SUPABASE_URL/rest/v1/candidate_assessment?id=eq.${ASSESSMENT_ID}&status=eq.Started" \
   -H "apikey: $SUPABASE_API_KEY" \
   -H "Authorization: Bearer $SUPABASE_API_KEY" \
   -H "Content-Type: application/json" \

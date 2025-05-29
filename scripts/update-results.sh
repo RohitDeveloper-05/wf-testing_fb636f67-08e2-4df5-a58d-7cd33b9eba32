@@ -20,7 +20,7 @@ payload=$(jq -n \
   --arg score "$testScore" \
    '{ results: { "result-score": $score, "result-summary": $summary } }')
 
-curl -s -o /dev/null -w "%{http_code}" -X PATCH "$SUPABASE_URL/rest/v1/candidate_assessment?id=eq.${ASSESSMENT_ID}&status=eq.In-Progress" \
+curl -s -o /dev/null -w "%{http_code}" -X PATCH "$SUPABASE_URL/rest/v1/candidate_assessment?id=eq.${ASSESSMENT_ID}&status=eq.Started" \
   -H "apikey: $SUPABASE_API_KEY" \
   -H "Authorization: Bearer $SUPABASE_API_KEY" \
   -H "Content-Type: application/json" \

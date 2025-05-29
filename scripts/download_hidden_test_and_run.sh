@@ -1,9 +1,14 @@
 #!/bin/bash
+set -e
+
+# Extract assessment name
 IFS='_' read -ra parts <<< "$REPO_NAME"
-export FLOW_NAME="${parts[0]}"
+export ASSESSMENT_NAME="${parts[0]}"
+export FLOW_NAME="$ASSESSMENT_NAME"
 
-echo "Flow Name derived from REPO_NAME: $FLOW_NAME"
+echo "Flow Name derived from REPO_NAME: $ASSESSMENT_NAME"
 
+# Run Node.js script to fetch and download test case
 node <<'EOF'
 const { createClient } = require('@supabase/supabase-js');
 const { execSync } = require('child_process');
@@ -11,12 +16,12 @@ const { execSync } = require('child_process');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 (async () => {
-  const flowName = process.env.FLOW_NAME;
+  const Assessment_Name = process.env.FLOW_NAME;
 
   const { data, error } = await supabase
     .from('assessments')           
     .select('*')                
-    .eq('name', flowName);  // Corrected here
+    .eq('name', Assessment_Name);  
 
   if (error) {
     console.error('Supabase error:', error);
@@ -41,7 +46,6 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
   }
 })();
 EOF
-<<<<<<< HEAD:scripts/download_hidden_test_and_run.sh
 
 # Run unit tests silently
 echo "Running unit tests..."
@@ -50,5 +54,3 @@ TEST_EXIT_CODE=$?
 
 # Always exit 0
 exit 0
-=======
->>>>>>> main:scripts/fetch-hidden-tests.sh

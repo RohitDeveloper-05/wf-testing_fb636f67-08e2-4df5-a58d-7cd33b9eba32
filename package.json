@@ -8,7 +8,8 @@
     "dev": "nodemon src/index.js",
     "lint": "eslint --fix src",
     "seed": "node src/db/seed.js",
-    "prettier": "prettier src --write"
+    "prettier": "prettier src --write",
+    "unit": "jest"
   },
   "keywords": [],
   "author": "",

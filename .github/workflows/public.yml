@@ -21,8 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      - name: Run public test cases
-        run: npm test
-
       - name: Cleanup old results file
         run: rm -f results.json
+
+      - name: Run public test cases
+        run: npm test

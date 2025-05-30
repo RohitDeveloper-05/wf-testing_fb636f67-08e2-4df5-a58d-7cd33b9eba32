@@ -23,3 +23,6 @@ jobs:
 
       - name: Run public test cases
         run: npm test
+
+      - name: Cleanup old results file
+        run: rm -f results.json

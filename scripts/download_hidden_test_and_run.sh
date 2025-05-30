@@ -48,9 +48,5 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 EOF
 
 # Run unit tests silently
-echo "Running unit tests..."
-npm run unit > /dev/null 2>&1
-TEST_EXIT_CODE=$?
-
-# Always exit 0
+echo "Tests downloaded. Jest will be run in the workflow."
 exit 0

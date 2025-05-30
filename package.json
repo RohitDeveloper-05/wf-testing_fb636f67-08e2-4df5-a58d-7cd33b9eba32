@@ -7,9 +7,9 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint --fix src",
-    "unit": "cross-env SESSION_SECRET=notsecure jest --injectGlobals=false --forceExit --json --outputFile=results.json",
     "seed": "node src/db/seed.js",
-    "prettier": "prettier src --write"
+    "prettier": "prettier src --write",
+    "test": "cross-env SESSION_SECRET=notsecure jest --injectGlobals=false --forceExit"
   },
   "keywords": [],
   "author": "",

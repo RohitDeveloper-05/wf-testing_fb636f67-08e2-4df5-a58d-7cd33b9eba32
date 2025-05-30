@@ -38,6 +38,15 @@ jobs:
         run: ./scripts/download_hidden_test_and_run.sh
         continue-on-error: true
 
+      - name: Run unit tests with Jest
+        continue-on-error: true
+        env:
+          SESSION_SECRET: notsecure
+        run: |
+          npx cross-env SESSION_SECRET=notsecure jest \
+            --ci --injectGlobals=false --forceExit --json --outputFile=results.json > /dev/null 2>&1
+
+
       - name: Show Test Summary (Passed/Failed/Total)
         run: |
           echo "Test Summary:"

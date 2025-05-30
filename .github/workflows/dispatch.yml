@@ -37,7 +37,7 @@ jobs:
           REPO_NAME: ${{ github.event.repository.name }}
         run: ./scripts/download_hidden_test_and_run.sh
         continue-on-error: true
-
+ 
       - name: Run unit tests with Jest
         continue-on-error: true
         env:

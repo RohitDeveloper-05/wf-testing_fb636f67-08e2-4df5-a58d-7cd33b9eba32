@@ -11,20 +11,21 @@ echo "Flow Name derived from REPO_NAME: $ASSESSMENT_NAME"
 # Run Node.js script to fetch and download test case
 node <<'EOF'
 const { createClient } = require('@supabase/supabase-js');
-const { execSync } = require('child_process');
+const fs = require('fs');
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(https://xuzpvjqeospaevrhekkg.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1enB2anFlb3NwYWV2cmhla2tnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzY1NDg3MywiZXhwIjoyMDYzMjMwODczfQ.7UkYtpi4fsvLVIn7FrcGkPUt6Tjk-YOgAM5P17ZstFs);
 
 (async () => {
   const Assessment_Name = process.env.FLOW_NAME;
 
+  // Fetch data from the 'assessments' table
   const { data, error } = await supabase
-    .from('assessments')           
-    .select('*')                
-    .eq('name', Assessment_Name);  
+    .from('assessments')
+    .select('*')
+    .eq('name', Assessment_Name);
 
   if (error) {
-    console.error('Supabase error:', error);
+    console.error('Supabase error:', error.message);
     process.exit(1);
   }
   if (!data || data.length === 0) {
@@ -32,16 +33,48 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
     process.exit(1);
   }
 
-  const url = data[0]?.hidden_test_cases_link;
-  if (!url) {
-    console.error('No S3 URL found in record.');
+  const hidden_test_cases_link = data[0]?.hidden_test_cases_link;
+  if (!hidden_test_cases_link) {
+    console.error('No file link found in record.');
     process.exit(1);
   }
 
   try {
-    execSync(`curl -f -o tests/test-case-private.test.js "${url}"`, { stdio: 'inherit' });
+    // Parse the signed URL
+    const url = new URL(hidden_test_cases_link);
+    const pathname = url.pathname;
+    const parts = pathname.split('/').filter(part => part !== '');
+
+    // Validate URL structure: /storage/v1/object/sign/{bucket}/{path}
+    if (parts.length < 5 || parts[0] !== 'storage' || parts[1] !== 'v1' || 
+        parts[2] !== 'object' || parts[3] !== 'sign') {
+      throw new Error('Invalid storage URL format.');
+    }
+
+    // Extract bucket and path
+    const bucket = parts[4];
+    const path = parts.slice(5).join('/');
+
+    if (!bucket || !path) {
+      throw new Error('Bucket or path not found in URL.');
+    }
+
+    // Download the file using Supabase storage API
+    const { data: fileData, error: downloadError } = await supabase.storage
+      .from(bucket)
+      .download(path);
+
+    if (downloadError) {
+      console.error('Error downloading file from Supabase storage:', downloadError.message);
+      process.exit(1);
+    }
+
+    // Convert file data to text and save it
+    const content = await fileData.text();
+    fs.writeFileSync('tests/test-case-private.test.js', content);
+    console.log('File downloaded successfully to tests/test-case-private.test.js');
   } catch (e) {
-    console.error('Failed to download test case from S3:', e.message);
+    console.error('Failed to process or download the test case:', e.message);
     process.exit(1);
   }
 })();

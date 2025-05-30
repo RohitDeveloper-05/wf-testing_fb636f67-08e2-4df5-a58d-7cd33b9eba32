@@ -19,6 +19,7 @@
   },
   "license": "",
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",

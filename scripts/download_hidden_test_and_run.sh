@@ -16,7 +16,7 @@ const fs = require('fs');
 const supabase = createClient("https://xuzpvjqeospaevrhekkg.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1enB2anFlb3NwYWV2cmhla2tnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzY1NDg3MywiZXhwIjoyMDYzMjMwODczfQ.7UkYtpi4fsvLVIn7FrcGkPUt6Tjk-YOgAM5P17ZstFs");
 
 (async () => {
-  const Assessment_Name = ASSESSMENT_NAME;
+  const Assessment_Name = process.env.ASSESSMENT_NAME;
 
   // Fetch data from the 'assessments' table
   const { data, error } = await supabase

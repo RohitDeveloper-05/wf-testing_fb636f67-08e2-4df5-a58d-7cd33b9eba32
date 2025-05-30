@@ -9,7 +9,7 @@
     "lint": "eslint --fix src",
     "seed": "node src/db/seed.js",
     "prettier": "prettier src --write",
-    "unit": "jest"
+    "test": "cross-env SESSION_SECRET=notsecure jest --injectGlobals=false --forceExit"
   },
   "keywords": [],
   "author": "",
